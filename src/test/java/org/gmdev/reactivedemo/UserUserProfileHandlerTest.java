@@ -3,10 +3,10 @@ package org.gmdev.reactivedemo;
 import org.gmdev.reactivedemo.controller.model.CreateUserProfileApiReq;
 import org.gmdev.reactivedemo.model.UserProfile;
 import org.gmdev.reactivedemo.repository.UserProfileRepository;
+import org.gmdev.reactivedemo.setup.MongoDBTestContainerSetup;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -17,9 +17,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
 @AutoConfigureWebTestClient
-class UserUserProfileHandlerTest {
+class UserUserProfileHandlerTest extends MongoDBTestContainerSetup {
 
     @Autowired
     private WebTestClient webTestClient;
