@@ -1,5 +1,6 @@
 package org.gmdev.reactivedemo;
 
+import org.gmdev.reactivedemo.controller.model.CreateUserProfileApiReq;
 import org.gmdev.reactivedemo.model.UserProfile;
 import org.gmdev.reactivedemo.repository.UserProfileRepository;
 import org.junit.jupiter.api.Test;
@@ -43,9 +44,9 @@ class UserUserProfileHandlerTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$.[0].id").isEqualTo("1")
-                .jsonPath("$.[0].email").isEqualTo("email1@email.com")
+                .jsonPath("$.[0].emailAddress").isEqualTo("email1@email.com")
                 .jsonPath("$.[1].id").isEqualTo("2")
-                .jsonPath("$.[1].email").isEqualTo("email2@email.com");
+                .jsonPath("$.[1].emailAddress").isEqualTo("email2@email.com");
     }
 
     @Test
@@ -64,21 +65,23 @@ class UserUserProfileHandlerTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(data.getId())
-                .jsonPath("$.email").isEqualTo(data.getEmail());
+                .jsonPath("$.emailAddress").isEqualTo(data.getEmail());
     }
 
     @Test
     public void itShouldSaveNewUserProfile() {
         // Given
-        UserProfile data = new UserProfile("123", "email@email.com");
-        when(repository.save(any())).thenReturn(Mono.just(data));
+        UserProfile fakeUserProfile = new UserProfile("123", "email@email.com");
+        when(repository.save(any())).thenReturn(Mono.just(fakeUserProfile));
+
+        CreateUserProfileApiReq bodyReq = new CreateUserProfileApiReq("email@email.com");
 
         // When - Then
         webTestClient
                 .post()
                 .uri("/user-profiles")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(Mono.just(data), UserProfile.class)
+                .body(Mono.just(bodyReq), CreateUserProfileApiReq.class)
                 .exchange()
                 .expectStatus().isCreated();
     }

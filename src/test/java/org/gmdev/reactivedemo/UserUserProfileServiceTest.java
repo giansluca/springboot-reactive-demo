@@ -1,5 +1,7 @@
 package org.gmdev.reactivedemo;
 
+import org.gmdev.reactivedemo.controller.model.CreateUserProfileApiReq;
+import org.gmdev.reactivedemo.controller.model.UserProfileApiRes;
 import org.gmdev.reactivedemo.model.UserProfile;
 import org.gmdev.reactivedemo.repository.UserProfileRepository;
 import org.gmdev.reactivedemo.service.UserProfileService;
@@ -44,7 +46,7 @@ class UserUserProfileServiceTest {
         List<UserProfile> allUserProfiles = initData.collectList().block();
 
         // When
-        Flux<UserProfile> actual = underTest.all();
+        Flux<UserProfileApiRes> actual = underTest.all();
 
         // Then
         assertThat(allUserProfiles).isNotNull();
@@ -59,60 +61,65 @@ class UserUserProfileServiceTest {
     @Test
     public void itShouldSaveNewProfile() {
         // Given
+        CreateUserProfileApiReq bodyReq = new CreateUserProfileApiReq("email@email.com");
+
         // When
-        Mono<UserProfile> profileMono = this.underTest.create("email@email.com");
+        Mono<String> monoResult = this.underTest.create(bodyReq);
 
         // Then
         StepVerifier
-                .create(profileMono)
-                .expectNextMatches(saved -> StringUtils.hasText(saved.getId()))
+                .create(monoResult)
+                .expectNextMatches(StringUtils::hasText)
                 .verifyComplete();
     }
 
     @Test
     public void itShouldDeleteProfileById() {
         // Given
-        String test = "test";
+        CreateUserProfileApiReq bodyReq = new CreateUserProfileApiReq("email@email.com");
 
         // When
-        Mono<UserProfile> deleted = this.underTest.create(test)
-                .flatMap(saved -> this.underTest.delete(saved.getId()));
+        Mono<UserProfile> deleted = this.underTest.create(bodyReq)
+                .flatMap(savedId -> this.underTest.delete(savedId));
 
         // Then
         StepVerifier
                 .create(deleted)
-                .expectNextMatches(profile -> profile.getEmail().equalsIgnoreCase(test))
+                .expectNextMatches(profile -> profile.getEmail().equalsIgnoreCase("email@email.com"))
                 .verifyComplete();
     }
 
     @Test
     public void itShouldUpdateProfile() {
         // Given
+        CreateUserProfileApiReq bodyReq = new CreateUserProfileApiReq("email@email.com");
+
         // When
-        Mono<UserProfile> updated = this.underTest.create("test")
-                .flatMap(p -> this.underTest.update(p.getId(), "test1"));
+        Mono<UserProfile> updated = this.underTest.create(bodyReq)
+                .flatMap(p -> this.underTest.update(p, "email-updated@email.com"));
 
         // Then
         StepVerifier
                 .create(updated)
-                .expectNextMatches(p -> p.getEmail().equalsIgnoreCase("test1"))
+                .expectNextMatches(p -> p.getEmail().equalsIgnoreCase("email-updated@email.com"))
                 .verifyComplete();
     }
 
     @Test
-    public void itShouldGetTemplateById() {
+    public void itShouldGetById() {
         // Given
-        String test = UUID.randomUUID().toString();
+        String email = "email@email.com";
+        CreateUserProfileApiReq bodyReq = new CreateUserProfileApiReq("email@email.com");
 
         // When
-        Mono<UserProfile> selected = this.underTest.create(test)
-                .flatMap(saved -> this.underTest.get(saved.getId()));
+        Mono<UserProfileApiRes> selected = this.underTest.create(bodyReq)
+                .flatMap(savedId -> this.underTest.get(savedId));
 
         // Then
         StepVerifier
                 .create(selected)
                 .expectNextMatches(profile -> StringUtils.hasText(profile.getId()) &&
-                        test.equalsIgnoreCase(profile.getEmail()))
+                        email.equalsIgnoreCase(profile.getEmailAddress()))
                 .verifyComplete();
     }
 

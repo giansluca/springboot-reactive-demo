@@ -1,6 +1,7 @@
 package org.gmdev.reactivedemo.model;
 
 import lombok.*;
+import org.gmdev.reactivedemo.controller.model.UserProfileApiRes;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,5 +14,9 @@ public class UserProfile {
     private String id;
 
     private String email;
+
+    public UserProfileApiRes toApiRes() {
+        return new UserProfileApiRes(id, email);
+    }
 
 }

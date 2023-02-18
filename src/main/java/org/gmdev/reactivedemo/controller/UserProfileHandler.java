@@ -1,18 +1,24 @@
 package org.gmdev.reactivedemo.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.gmdev.reactivedemo.controller.model.CreateUserProfileApiReq;
+import org.gmdev.reactivedemo.controller.model.UserProfileApiRes;
 import org.gmdev.reactivedemo.model.UserProfile;
 import org.gmdev.reactivedemo.service.UserProfileService;
 import org.reactivestreams.Publisher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
+@Slf4j
 @Component
 public class UserProfileHandler {
 
@@ -24,30 +30,54 @@ public class UserProfileHandler {
     }
 
     public Mono<ServerResponse> all(ServerRequest request) {
-        return defaultReadResponse(this.userProfileService.all());
+        log.info("incoming call to path: '{}' with method: '{}'", request.path(), request.method());
+        Flux<UserProfileApiRes> fluxResult = this.userProfileService.all();
+
+        return ServerResponse
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(fluxResult, UserProfileApiRes.class);
     }
 
     public Mono<ServerResponse> getById(ServerRequest request) {
-        return defaultReadResponse(this.userProfileService.get(id(request)));
+        log.info("incoming call to path: '{}' with method: '{}'", request.path(), request.method());
+        String userProfileId = request.pathVariable("id");
+
+        Mono<UserProfileApiRes> monoResult = userProfileService.get(userProfileId)
+                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
+
+        return ServerResponse
+                .ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(monoResult, UserProfileApiRes.class);
     }
 
     public Mono<ServerResponse> create(ServerRequest request) {
-        Flux<UserProfile> flux = request
-                .bodyToFlux(UserProfile.class)
-                .flatMap(toWrite -> this.userProfileService.create(toWrite.getEmail()));
+        log.info("incoming call to path: '{}' with method: '{}'", request.path(), request.method());
 
-        return defaultWriteResponse(flux);
+        Mono<String> monoResult = request
+                .bodyToMono(CreateUserProfileApiReq.class)
+                .flatMap(userProfileService::create);
+
+        return ServerResponse
+                .created(URI.create(String.format("/profiles/%s", monoResult)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .build();
     }
 
     public Mono<ServerResponse> updateById(ServerRequest request) {
+        String userProfileId = request.pathVariable("id");
+
         Flux<UserProfile> id = request.bodyToFlux(UserProfile.class)
-                .flatMap(p -> this.userProfileService.update(id(request), p.getEmail()));
+                .flatMap(p -> this.userProfileService.update(userProfileId, p.getEmail()));
 
         return defaultReadResponse(id);
     }
 
     public Mono<ServerResponse> deleteById(ServerRequest request) {
-        return defaultReadResponse(this.userProfileService.delete(id(request)));
+        String userProfileId = request.pathVariable("id");
+
+        return defaultReadResponse(this.userProfileService.delete(userProfileId));
     }
 
     private static Mono<ServerResponse> defaultWriteResponse(Publisher<UserProfile> profiles) {
@@ -67,7 +97,5 @@ public class UserProfileHandler {
                 .body(profiles, UserProfile.class);
     }
 
-    private static String id(ServerRequest request) {
-        return request.pathVariable("id");
-    }
+
 }
