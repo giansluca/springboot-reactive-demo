@@ -7,4 +7,5 @@ public class UserProfileCreatedEvent extends ApplicationEvent {
     public UserProfileCreatedEvent(Object source) {
         super(source);
     }
+
 }

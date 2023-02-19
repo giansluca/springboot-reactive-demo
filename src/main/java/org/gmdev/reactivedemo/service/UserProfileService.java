@@ -1,6 +1,7 @@
 package org.gmdev.reactivedemo.service;
 
 import org.gmdev.reactivedemo.controller.model.CreateUserProfileApiReq;
+import org.gmdev.reactivedemo.controller.model.UpdateUserProfileApiReq;
 import org.gmdev.reactivedemo.controller.model.UserProfileApiRes;
 import org.gmdev.reactivedemo.event.UserProfileCreatedEvent;
 import org.gmdev.reactivedemo.model.UserProfile;
@@ -33,22 +34,23 @@ public class UserProfileService {
         return repository.findById(id).map(UserProfile::toApiRes);
     }
 
-    public Mono<String> create(CreateUserProfileApiReq bodyReq) {
+    public Mono<UserProfileApiRes> create(CreateUserProfileApiReq bodyReq) {
         return repository.save(new UserProfile(UUID.randomUUID().toString(), bodyReq.getEmail()))
-                .map(UserProfile::getId)
-                .doOnSuccess(entity -> publisher.publishEvent(new UserProfileCreatedEvent(entity)));
+                .map(UserProfile::toApiRes)
+                .doOnSuccess(createdProfile -> publisher.publishEvent(new UserProfileCreatedEvent(createdProfile)));
     }
 
-    public Mono<UserProfile> update(String id, String email) {
+    public Mono<UserProfileApiRes> update(String id, UpdateUserProfileApiReq bodyReq) {
         return repository.findById(id)
-                .map(p -> new UserProfile(p.getId(), email))
-                .flatMap(repository::save);
+                .map(p -> new UserProfile(p.getId(), bodyReq.getEmail()))
+                .flatMap(repository::save)
+                .map(UserProfile::toApiRes);
     }
 
-    public Mono<UserProfile> delete(String id) {
-        return repository
-                .findById(id)
-                .flatMap(p -> repository.deleteById(p.getId()).thenReturn(p));
+    public Mono<UserProfileApiRes> delete(String id) {
+        return repository.findById(id)
+                .flatMap(p -> repository.deleteById(p.getId()).thenReturn(p))
+                .map(UserProfile::toApiRes);
     }
 
 }

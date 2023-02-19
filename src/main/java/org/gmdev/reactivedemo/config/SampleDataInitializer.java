@@ -5,7 +5,7 @@ import org.gmdev.reactivedemo.model.UserProfile;
 import org.gmdev.reactivedemo.repository.UserProfileRepository;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Profile;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -13,7 +13,6 @@ import java.util.UUID;
 
 @Slf4j
 @Component
-@Profile("demo")
 public class SampleDataInitializer implements ApplicationListener<ApplicationReadyEvent> {
 
     private final UserProfileRepository userProfileRepository;
@@ -23,16 +22,15 @@ public class SampleDataInitializer implements ApplicationListener<ApplicationRea
     }
 
     @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
+    public void onApplicationEvent(@Nullable ApplicationReadyEvent event) {
         userProfileRepository
                 .deleteAll()
-                .thenMany(
-                        Flux.just("A", "B", "C", "D")
-                                .map(name -> new UserProfile(UUID.randomUUID().toString(), name + "@email.com"))
-                                .flatMap(userProfileRepository::save)
+                .thenMany(Flux.just("A", "B", "C", "D")
+                        .map(name -> new UserProfile(UUID.randomUUID().toString(), name + "@email.com"))
+                        .flatMap(userProfileRepository::save)
                 )
                 .thenMany(userProfileRepository.findAll())
-                .subscribe(profile -> log.info("saving " + profile.toString()));
+                .subscribe(userProfile -> log.info("saving " + userProfile.toString()));
     }
 
 
