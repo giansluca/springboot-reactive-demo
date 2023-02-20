@@ -1,4 +1,4 @@
-package org.gmdev.reactivedemo.controller;
+package org.gmdev.reactivedemo.setup;
 
 
 import org.gmdev.reactivedemo.model.UserProfile;

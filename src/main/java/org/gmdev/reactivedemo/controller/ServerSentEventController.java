@@ -2,8 +2,8 @@ package org.gmdev.reactivedemo.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.gmdev.reactivedemo.event.UserProfileCreatedEvent;
-import org.gmdev.reactivedemo.event.UserProfileCreatedEventPublisher;
+import org.gmdev.reactivedemo.websocket.event.UserProfileCreatedEvent;
+import org.gmdev.reactivedemo.websocket.event.UserProfileCreatedEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;

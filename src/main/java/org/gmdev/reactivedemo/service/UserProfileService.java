@@ -3,7 +3,7 @@ package org.gmdev.reactivedemo.service;
 import org.gmdev.reactivedemo.controller.model.CreateUserProfileApiReq;
 import org.gmdev.reactivedemo.controller.model.UpdateUserProfileApiReq;
 import org.gmdev.reactivedemo.controller.model.UserProfileApiRes;
-import org.gmdev.reactivedemo.event.UserProfileCreatedEvent;
+import org.gmdev.reactivedemo.websocket.event.UserProfileCreatedEvent;
 import org.gmdev.reactivedemo.model.UserProfile;
 import org.gmdev.reactivedemo.repository.UserProfileRepository;
 import org.springframework.context.ApplicationEventPublisher;

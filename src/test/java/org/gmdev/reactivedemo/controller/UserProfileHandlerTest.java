@@ -5,7 +5,8 @@ import org.gmdev.reactivedemo.controller.model.UpdateUserProfileApiReq;
 import org.gmdev.reactivedemo.controller.model.UserProfileApiRes;
 import org.gmdev.reactivedemo.model.UserProfile;
 import org.gmdev.reactivedemo.setup.MongoDBTestContainerSetup;
-import org.junit.jupiter.api.BeforeEach;
+import org.gmdev.reactivedemo.setup.UserProfileTestHelper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -27,7 +28,7 @@ class UserProfileHandlerTest extends MongoDBTestContainerSetup {
     @Autowired
     UserProfileTestHelper userProfileTestHelper;
 
-    @BeforeEach
+    @AfterEach
     void setUp() {
         userProfileTestHelper.cleanDb();
     }

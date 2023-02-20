@@ -1,14 +1,16 @@
-package org.gmdev.reactivedemo.event;
+package org.gmdev.reactivedemo.websocket.event;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.FluxSink;
 
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -16,13 +18,8 @@ import java.util.function.Consumer;
 public class UserProfileCreatedEventPublisher
         implements ApplicationListener<UserProfileCreatedEvent>, Consumer<FluxSink<UserProfileCreatedEvent>> {
 
-    private final Executor executor;
+    private final Executor executor = Executors.newFixedThreadPool(3);
     private final BlockingQueue<UserProfileCreatedEvent> queue = new LinkedBlockingDeque<>();
-
-    @Autowired
-    public UserProfileCreatedEventPublisher(Executor executor) {
-        this.executor = executor;
-    }
 
     @Override
     public void onApplicationEvent(@Nullable UserProfileCreatedEvent event) {
@@ -35,7 +32,7 @@ public class UserProfileCreatedEventPublisher
     @Override
     public void accept(FluxSink<UserProfileCreatedEvent> sink) {
         executor.execute(() -> {
-            while (true)
+            while (true) {
                 try {
                     UserProfileCreatedEvent event = queue.take();
                     sink.next(event);
@@ -43,6 +40,7 @@ public class UserProfileCreatedEventPublisher
                 } catch (InterruptedException e) {
                     ReflectionUtils.rethrowRuntimeException(e);
                 }
+            }
         });
     }
 

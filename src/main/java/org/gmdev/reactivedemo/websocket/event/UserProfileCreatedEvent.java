@@ -1,4 +1,4 @@
-package org.gmdev.reactivedemo.event;
+package org.gmdev.reactivedemo.websocket.event;
 
 import org.springframework.context.ApplicationEvent;
 
