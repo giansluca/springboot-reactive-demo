@@ -1,6 +1,7 @@
 package org.gmdev.reactivedemo.websocket.event;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -20,16 +21,24 @@ public class UserProfileCreatedEventPublisher
 
     private final Executor executor = Executors.newFixedThreadPool(3);
     private final BlockingQueue<UserProfileCreatedEvent> queue = new LinkedBlockingDeque<>();
+    private final EventSinkService eventSinkService;
+
+    @Autowired
+    public UserProfileCreatedEventPublisher(EventSinkService eventSinkService) {
+        this.eventSinkService = eventSinkService;
+    }
 
     @Override
     public void onApplicationEvent(@Nullable UserProfileCreatedEvent event) {
         if (event == null) return;
 
         log.info("Received user created event");
-        queue.offer(event);
+        //queue.offer(event);
+        eventSinkService.onNext(event);
     }
 
     @Override
+    @SuppressWarnings("InfiniteLoopStatement")
     public void accept(FluxSink<UserProfileCreatedEvent> sink) {
         executor.execute(() -> {
             while (true) {
