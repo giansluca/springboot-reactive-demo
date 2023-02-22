@@ -1,6 +1,4 @@
 
-
 bidirectional event
 generic to events
 sse
-springboot 3

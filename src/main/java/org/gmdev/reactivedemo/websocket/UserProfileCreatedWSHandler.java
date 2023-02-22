@@ -44,13 +44,17 @@ public class UserProfileCreatedWSHandler implements WebSocketHandler {
             }
         });
 
-        return session.send(socketMessage).and(session.receive().map(webSocketMessage -> {
-                    String clientMessage = webSocketMessage.getPayloadAsText();
+        return session.send(socketMessage)
+                .and(receive(session));
+    }
 
-                    log.info("message from the client: {}", clientMessage);
-                    return webSocketMessage;
-                })
-        );
+    private Flux<WebSocketMessage> receive(WebSocketSession session) {
+        return session.receive().map(webSocketMessage -> {
+            String clientMessage = webSocketMessage.getPayloadAsText();
+
+            log.info("message from the client: {}", clientMessage);
+            return webSocketMessage;
+        });
     }
 
 
