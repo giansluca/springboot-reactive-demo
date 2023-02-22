@@ -6,21 +6,21 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 import reactor.core.publisher.Sinks.Many;
 
-import static reactor.core.publisher.Sinks.EmitFailureHandler.*;
-
 @Slf4j
 @Component
 public class EventSinkServiceImp implements EventSinkService {
 
+    private final Sinks.EmitFailureHandler emitFailureHandler =
+            (signalType, emitResult) -> emitResult.equals(Sinks.EmitResult.FAIL_NON_SERIALIZED);
     private final Many<UserProfileCreatedEvent> sink;
 
     public EventSinkServiceImp() {
-        sink =  Sinks.many().multicast().directBestEffort();
+        sink = Sinks.many().multicast().directBestEffort();
     }
 
     @Override
     public void onNext(UserProfileCreatedEvent event) {
-        sink.emitNext(event, FAIL_FAST);
+        sink.emitNext(event, emitFailureHandler);
     }
 
     @Override

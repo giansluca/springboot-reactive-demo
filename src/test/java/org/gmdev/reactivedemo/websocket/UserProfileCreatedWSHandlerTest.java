@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 class UserProfileCreatedWSHandlerTest extends MongoDBTestContainerSetup {
 
@@ -36,20 +36,16 @@ class UserProfileCreatedWSHandlerTest extends MongoDBTestContainerSetup {
     }
 
     @Test
-    public void testNotificationsOnUpdates() throws Exception {
+    public void testCreateUserProfileEventWebSocket() throws Exception {
         int count = 10;
         AtomicLong counter = new AtomicLong();
         URI uri = URI.create("ws://localhost:" + randomServerPort + "/ws/user-profile-created");
 
         socketClient.execute(uri, (WebSocketSession session) -> {
-            Mono<WebSocketMessage> out = Mono.just(session.textMessage("test-123"));
+            Mono<WebSocketMessage> out = Mono.just(session.textMessage("message-test-123"));
+            Flux<String> in = session.receive().map(WebSocketMessage::getPayloadAsText);
 
-            Flux<String> in = session
-                    .receive()
-                    .map(WebSocketMessage::getPayloadAsText);
-
-            return session
-                    .send(out)
+            return session.send(out)
                     .thenMany(in)
                     .doOnNext(str -> counter.incrementAndGet())
                     .then();
@@ -78,5 +74,6 @@ class UserProfileCreatedWSHandlerTest extends MongoDBTestContainerSetup {
     private UserProfile generateRandomProfile() {
         return new UserProfile(UUID.randomUUID().toString(), UUID.randomUUID() + "@email.com");
     }
+
 
 }

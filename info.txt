@@ -1,6 +1,6 @@
 
 
-manage event, sink - queue
-other events
+bidirectional event
+generic to events
 sse
 springboot 3

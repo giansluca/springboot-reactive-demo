@@ -8,10 +8,24 @@
 <body>
 Hola!
 <script>
-  const socket = new WebSocket('ws://localhost:8080/ws/user-profile-created');
-  socket.addEventListener('message', function (event) {
-    window.alert('message from server: ' + event.data);
-  });
+    const socket = new WebSocket('ws://localhost:8080/ws/user-profile-created');
+
+    socket.onmessage = (event) => {
+        alert("Message from server: " + event.data);
+    }
+    socket.onerror = (error) => {
+        alert("Error:" + error);
+    };
+
+    function sendData() {
+        socket.send("Here's some text that the server is urgently awaiting!")
+    }
 </script>
+
+<div>
+    <br>
+    <button onclick="sendData()">send</button>
+</div>
+
 </body>
 </html>
