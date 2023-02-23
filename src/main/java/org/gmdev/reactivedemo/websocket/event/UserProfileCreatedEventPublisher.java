@@ -1,14 +1,21 @@
 package org.gmdev.reactivedemo.websocket.event;
 
 import lombok.extern.slf4j.Slf4j;
+import org.gmdev.reactivedemo.model.UserProfile;
+import org.gmdev.reactivedemo.websocket.event.model.AppUserProfileCreatedEvent;
+import org.gmdev.reactivedemo.websocket.event.model.ReactiveUserProfileCreatedEvent;
+import org.gmdev.reactivedemo.websocket.event.model.ReactiveUserProfileCreatedEvent.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
+
+import static org.gmdev.reactivedemo.websocket.event.model.ReactiveEvent.EventType.USER_PROFILE_CREATED;
 
 @Slf4j
 @Component
-public class UserProfileCreatedEventPublisher implements ApplicationListener<UserProfileCreatedEvent> {
+public class UserProfileCreatedEventPublisher implements ApplicationListener<AppUserProfileCreatedEvent> {
 
     private final EventSinkService eventSinkService;
 
@@ -18,9 +25,17 @@ public class UserProfileCreatedEventPublisher implements ApplicationListener<Use
     }
 
     @Override
-    public void onApplicationEvent(@Nullable UserProfileCreatedEvent event) {
-        log.info("Received application event: UserProfileCreatedEvent");
-        eventSinkService.onNext(event);
+    public void onApplicationEvent(AppUserProfileCreatedEvent event) {
+        UserProfile userProfile = (UserProfile) event.getSource();
+
+        var reactiveEvent = new ReactiveUserProfileCreatedEvent(
+                UUID.randomUUID().toString(),
+                USER_PROFILE_CREATED,
+                new Data(userProfile.getId(), userProfile.getEmail())
+        );
+
+        log.info("Received application event: ReactiveUserProfileCreatedEvent");
+        eventSinkService.onNext(reactiveEvent);
     }
 
 

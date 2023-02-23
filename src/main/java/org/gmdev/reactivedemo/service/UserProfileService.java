@@ -3,9 +3,9 @@ package org.gmdev.reactivedemo.service;
 import org.gmdev.reactivedemo.controller.model.CreateUserProfileApiReq;
 import org.gmdev.reactivedemo.controller.model.UpdateUserProfileApiReq;
 import org.gmdev.reactivedemo.controller.model.UserProfileApiRes;
-import org.gmdev.reactivedemo.websocket.event.UserProfileCreatedEvent;
 import org.gmdev.reactivedemo.model.UserProfile;
 import org.gmdev.reactivedemo.repository.UserProfileRepository;
+import org.gmdev.reactivedemo.websocket.event.model.AppUserProfileCreatedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +36,8 @@ public class UserProfileService {
 
     public Mono<UserProfileApiRes> create(CreateUserProfileApiReq bodyReq) {
         return repository.save(new UserProfile(UUID.randomUUID().toString(), bodyReq.getEmail()))
-                .map(UserProfile::toApiRes)
-                .doOnSuccess(createdProfile -> publisher.publishEvent(new UserProfileCreatedEvent(createdProfile)));
+                .doOnSuccess(createdProfile -> publisher.publishEvent(new AppUserProfileCreatedEvent(createdProfile)))
+                .map(UserProfile::toApiRes);
     }
 
     public Mono<UserProfileApiRes> update(String id, UpdateUserProfileApiReq bodyReq) {

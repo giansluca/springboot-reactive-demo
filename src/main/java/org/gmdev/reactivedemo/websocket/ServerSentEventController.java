@@ -1,35 +1,30 @@
 package org.gmdev.reactivedemo.websocket;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.gmdev.reactivedemo.websocket.event.EventSinkService;
+import org.gmdev.reactivedemo.websocket.event.model.ReactiveEvent;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
+@Slf4j
 @RestController
 public class ServerSentEventController {
 
     private final EventSinkService eventSinkService;
-    private final ObjectMapper objectMapper;
 
-    public ServerSentEventController(EventSinkService eventSinkService, ObjectMapper objectMapper) {
+    public ServerSentEventController(EventSinkService eventSinkService) {
         this.eventSinkService = eventSinkService;
-        this.objectMapper = objectMapper;
     }
 
-    @GetMapping(path = "/sse/user-profiles", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @CrossOrigin(origins = "http://localhost:3000")
-    public Flux<String> userProfiles() {
-        return eventSinkService.getMessages().map(profileCreatedEvent -> {
-            try {
-                return objectMapper.writeValueAsString(profileCreatedEvent);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+    @GetMapping(path = "/sse/stream-flux", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<ReactiveEvent> userProfiles() {
+        try {
+            return eventSinkService.getMessages();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

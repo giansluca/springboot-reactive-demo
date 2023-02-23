@@ -1,4 +1,2 @@
 
-bidirectional event
-generic to events
 sse

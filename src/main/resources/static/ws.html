@@ -6,12 +6,12 @@
     </title>
 </head>
 <body>
-Hola!
 <script>
-    const socket = new WebSocket('ws://localhost:8080/ws/user-profile-created');
+    // Web Socket
+    const socket = new WebSocket("ws://localhost:8080/ws/base-websocket");
 
     socket.onmessage = (event) => {
-        appendEventData(event.data)
+        appendEventData(JSON.parse(event.data))
     }
     socket.onerror = (error) => {
         console.log(error)
@@ -24,16 +24,29 @@ Hola!
     function appendEventData(eventData) {
         const p = document.createElement("p");
         p.style.margin = "3px"
-        p.innerHTML = eventData;
-        document.getElementById("server-response").appendChild(p);
+        p.innerHTML = "Event type:  " + JSON.stringify(eventData.eventType) + " - Data:  " + JSON.stringify(eventData.data);
+        document.getElementById("server-response-1").appendChild(p);
     }
+
+    // Server Sent Event - SSE
+    const source = new EventSource('http://localhost:8080/sse/stream-flux');
+    source.onmessage = (event) => {
+        const el = document.getElementById("server-response-2");
+        el.appendChild(document.createTextNode(event.data + " "));
+    };
 </script>
 
+Hola!
+<button onclick="sendData()">send</button>
+<br>
 <div>
-    <br>
-    <button onclick="sendData()">send</button>
     <br><br>
-    <div id="server-response"></div>
+    <div id="server-response-1"></div>
+</div>
+<br><br>
+<div>
+    <br><br>
+    <div id="server-response-2"></div>
 </div>
 
 </body>

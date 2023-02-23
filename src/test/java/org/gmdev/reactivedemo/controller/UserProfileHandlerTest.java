@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
@@ -94,8 +95,8 @@ class UserProfileHandlerTest extends MongoDBTestContainerSetup {
                 .returnResult()
                 .getResponseBody();
 
-        assert userProfileCreated != null;
-        Mono<UserProfile> selected = userProfileTestHelper.findUserProfileById(userProfileCreated.getId());
+        Mono<UserProfile> selected = userProfileTestHelper
+                .findUserProfileById(Objects.requireNonNull(userProfileCreated).getId());
 
         StepVerifier
                 .create(selected)
@@ -127,8 +128,8 @@ class UserProfileHandlerTest extends MongoDBTestContainerSetup {
                 .returnResult()
                 .getResponseBody();
 
-        assert userProfileUpdated != null;
-        Mono<UserProfile> selected = userProfileTestHelper.findUserProfileById(userProfileUpdated.getId());
+        Mono<UserProfile> selected =
+                userProfileTestHelper.findUserProfileById(Objects.requireNonNull(userProfileUpdated).getId());
 
         StepVerifier
                 .create(selected)
@@ -157,8 +158,7 @@ class UserProfileHandlerTest extends MongoDBTestContainerSetup {
                 .getResponseBody();
 
 
-        assert userProfileDeleted != null;
-        assertThat(userProfileDeleted.getId()).isEqualTo(profileToDelete.getId());
+        assertThat(Objects.requireNonNull(userProfileDeleted).getId()).isEqualTo(profileToDelete.getId());
         List<UserProfile> actualUserProfiles = userProfileTestHelper.findAllUserProfiles().collectList().block();
         assertThat(actualUserProfiles).hasSize(us.size() - 1);
     }

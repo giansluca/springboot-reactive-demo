@@ -2,9 +2,8 @@ package org.gmdev.reactivedemo.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.gmdev.reactivedemo.controller.model.UserProfileApiRes;
 import org.gmdev.reactivedemo.websocket.event.EventSinkService;
-import org.gmdev.reactivedemo.websocket.event.UserProfileCreatedEvent;
+import org.gmdev.reactivedemo.websocket.event.model.ReactiveEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketHandler;
@@ -15,37 +14,31 @@ import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
-public class UserProfileCreatedWSHandler implements WebSocketHandler {
+public class BaseWebSocketHandler implements WebSocketHandler {
 
     private final EventSinkService eventSinkService;
     private final ObjectMapper mapper;
 
     @Autowired
-    public UserProfileCreatedWSHandler(EventSinkService eventSinkService, ObjectMapper mapper) {
+    public BaseWebSocketHandler(EventSinkService eventSinkService, ObjectMapper mapper) {
         this.eventSinkService = eventSinkService;
         this.mapper = mapper;
     }
 
     @Override
     public Mono<Void> handle(WebSocketSession session) {
-        Flux<UserProfileCreatedEvent> messages = eventSinkService.getMessages();
-
-        Flux<WebSocketMessage> socketMessage = messages.map(userProfileCreatedEvent -> {
+        Flux<ReactiveEvent> messages = eventSinkService.getMessages();
+        Flux<WebSocketMessage> socketMessage = messages.map(event -> {
             try {
-                UserProfileApiRes userProfile = (UserProfileApiRes) userProfileCreatedEvent.getSource();
-                String createdId = userProfile.getId();
-
-                log.info("sending to client UserProfileCreatedEvent with id: {}", createdId);
-
-                String messagePayload = mapper.writeValueAsString(userProfile);
+                log.info("sending to client {} with id: {}", event.getEventType(), event.getEventId());
+                String messagePayload = mapper.writeValueAsString(event);
                 return session.textMessage(messagePayload);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
 
-        return session.send(socketMessage)
-                .and(receive(session));
+        return session.send(socketMessage).and(receive(session));
     }
 
     private Flux<WebSocketMessage> receive(WebSocketSession session) {

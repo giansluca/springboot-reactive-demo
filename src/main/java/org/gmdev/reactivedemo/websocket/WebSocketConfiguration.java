@@ -16,17 +16,17 @@ import java.util.Map;
 @Configuration
 public class WebSocketConfiguration {
 
-    private final UserProfileCreatedWSHandler userProfileCreatedWSHandler;
+    private final BaseWebSocketHandler baseWebSocketHandler;
 
     @Autowired
-    public WebSocketConfiguration(UserProfileCreatedWSHandler userProfileCreatedWSHandler) {
-        this.userProfileCreatedWSHandler = userProfileCreatedWSHandler;
+    public WebSocketConfiguration(BaseWebSocketHandler baseWebSocketHandler) {
+        this.baseWebSocketHandler = baseWebSocketHandler;
     }
 
     @Bean
     public HandlerMapping handlerMapping() {
         Map<String, WebSocketHandler> map = new HashMap<>();
-        map.put("/ws/user-profile-created", userProfileCreatedWSHandler);
+        map.put("/ws/base-websocket", baseWebSocketHandler);
 
         SimpleUrlHandlerMapping handlerMapping = new SimpleUrlHandlerMapping();
         handlerMapping.setOrder(1);

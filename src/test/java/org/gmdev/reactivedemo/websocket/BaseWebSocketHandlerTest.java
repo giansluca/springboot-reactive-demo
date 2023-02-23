@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
-class UserProfileCreatedWSHandlerTest extends MongoDBTestContainerSetup {
+class BaseWebSocketHandlerTest extends MongoDBTestContainerSetup {
 
     private final WebSocketClient socketClient = new ReactorNettyWebSocketClient();
     private final WebClient webClient = WebClient.builder().build();
@@ -39,7 +39,7 @@ class UserProfileCreatedWSHandlerTest extends MongoDBTestContainerSetup {
     public void testCreateUserProfileEventWebSocket() throws Exception {
         int count = 10;
         AtomicLong counter = new AtomicLong();
-        URI uri = URI.create("ws://localhost:" + randomServerPort + "/ws/user-profile-created");
+        URI uri = URI.create("ws://localhost:" + randomServerPort + "/ws/base-websocket");
 
         socketClient.execute(uri, (WebSocketSession session) -> {
             Mono<WebSocketMessage> out = Mono.just(session.textMessage("message-test-123"));
