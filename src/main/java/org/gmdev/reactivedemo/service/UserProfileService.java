@@ -6,6 +6,7 @@ import org.gmdev.reactivedemo.controller.model.UserProfileApiRes;
 import org.gmdev.reactivedemo.model.UserProfile;
 import org.gmdev.reactivedemo.repository.UserProfileRepository;
 import org.gmdev.reactivedemo.websocket.event.model.AppUserProfileCreatedEvent;
+import org.gmdev.reactivedemo.websocket.event.model.AppUserProfileUpdatedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,16 +35,18 @@ public class UserProfileService {
         return repository.findById(id).map(UserProfile::toApiRes);
     }
 
-    public Mono<UserProfileApiRes> create(CreateUserProfileApiReq bodyReq) {
-        return repository.save(new UserProfile(UUID.randomUUID().toString(), bodyReq.getEmail()))
-                .doOnSuccess(createdProfile -> publisher.publishEvent(new AppUserProfileCreatedEvent(createdProfile)))
-                .map(UserProfile::toApiRes);
-    }
 
     public Mono<UserProfileApiRes> update(String id, UpdateUserProfileApiReq bodyReq) {
         return repository.findById(id)
                 .map(p -> new UserProfile(p.getId(), bodyReq.getEmail()))
                 .flatMap(repository::save)
+                .doOnSuccess(updatedProfile -> publisher.publishEvent(new AppUserProfileUpdatedEvent(updatedProfile)))
+                .map(UserProfile::toApiRes);
+    }
+
+    public Mono<UserProfileApiRes> create(CreateUserProfileApiReq bodyReq) {
+        return repository.save(new UserProfile(UUID.randomUUID().toString(), bodyReq.getEmail()))
+                .doOnSuccess(createdProfile -> publisher.publishEvent(new AppUserProfileCreatedEvent(createdProfile)))
                 .map(UserProfile::toApiRes);
     }
 

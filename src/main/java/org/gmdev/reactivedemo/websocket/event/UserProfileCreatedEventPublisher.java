@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.gmdev.reactivedemo.model.UserProfile;
 import org.gmdev.reactivedemo.websocket.event.model.AppUserProfileCreatedEvent;
 import org.gmdev.reactivedemo.websocket.event.model.ReactiveUserProfileCreatedEvent;
-import org.gmdev.reactivedemo.websocket.event.model.ReactiveUserProfileCreatedEvent.Data;
+import org.gmdev.reactivedemo.websocket.event.model.ReactiveUserProfileCreatedEvent.UserProfileCreated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -26,15 +26,15 @@ public class UserProfileCreatedEventPublisher implements ApplicationListener<App
 
     @Override
     public void onApplicationEvent(AppUserProfileCreatedEvent event) {
-        UserProfile userProfile = (UserProfile) event.getSource();
+        log.info("Received application event: AppUserProfileCreatedEvent");
 
+        UserProfile userProfile = (UserProfile) event.getSource();
         var reactiveEvent = new ReactiveUserProfileCreatedEvent(
                 UUID.randomUUID().toString(),
                 USER_PROFILE_CREATED,
-                new Data(userProfile.getId(), userProfile.getEmail())
+                new UserProfileCreated(userProfile.getId(), userProfile.getEmail())
         );
 
-        log.info("Received application event: ReactiveUserProfileCreatedEvent");
         eventSinkService.onNext(reactiveEvent);
     }
 

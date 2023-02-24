@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.gmdev.reactivedemo.websocket.event.EventSinkService;
 import org.gmdev.reactivedemo.websocket.event.model.ReactiveEvent;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -19,6 +20,7 @@ public class ServerSentEventController {
     }
 
     @GetMapping(path = "/sse/stream-flux", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @CrossOrigin(origins = "*")
     public Flux<ReactiveEvent> userProfiles() {
         try {
             return eventSinkService.getMessages();
