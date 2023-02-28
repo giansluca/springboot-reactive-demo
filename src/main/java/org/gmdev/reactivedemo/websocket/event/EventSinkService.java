@@ -7,6 +7,6 @@ public interface EventSinkService {
 
     void onNext(ReactiveEvent next);
 
-    Flux<ReactiveEvent > getMessages();
+    Flux<ReactiveEvent> getMessages();
 
 }

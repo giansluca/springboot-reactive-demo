@@ -8,10 +8,10 @@ public class ReactiveUserProfileCreatedEvent implements ReactiveEvent {
 
     private final String eventId;
     private final EventType eventType;
-    private final Object data;
+    private final UserProfileCreatedData data;
 
     @AllArgsConstructor @Getter
-    public static class UserProfileCreated {
+    public static class UserProfileCreatedData {
         private final String userProfileId;
         private final String emailAddress;
     }

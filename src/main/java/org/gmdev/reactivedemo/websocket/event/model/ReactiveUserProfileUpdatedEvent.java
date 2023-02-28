@@ -11,7 +11,7 @@ public class ReactiveUserProfileUpdatedEvent implements ReactiveEvent {
 
     private final String eventId;
     private final EventType eventType;
-    private final Object data;
+    private final UserProfileUpdatedData data;
 
     @AllArgsConstructor @Getter
     public static class UserProfileUpdatedData {

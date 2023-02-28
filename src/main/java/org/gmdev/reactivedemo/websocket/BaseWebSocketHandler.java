@@ -30,6 +30,9 @@ public class BaseWebSocketHandler implements WebSocketHandler {
         Flux<ReactiveEvent> messages = eventSinkService.getMessages();
         Flux<WebSocketMessage> socketMessage = messages.map(event -> {
             try {
+                if (event.getData() == null)
+                    throw new IllegalStateException("Alt! event data cannot be null!");
+
                 log.info("sending to client {} with id: {}", event.getEventType(), event.getEventId());
                 String messagePayload = mapper.writeValueAsString(event);
                 return session.textMessage(messagePayload);
