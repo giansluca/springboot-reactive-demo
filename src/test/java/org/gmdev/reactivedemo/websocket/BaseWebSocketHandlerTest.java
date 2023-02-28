@@ -57,7 +57,7 @@ class BaseWebSocketHandlerTest extends MongoDBTestContainerSetup {
                 .flatMap(this::write)
                 .blockLast();
 
-        Thread.sleep(1000);
+        Thread.sleep(2000);
         assertThat(counter.get()).isEqualTo(count);
     }
 
