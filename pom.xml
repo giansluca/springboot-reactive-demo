@@ -6,12 +6,12 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.5</version>
+		<version>3.1.4</version>
 		<relativePath/>
 	</parent>
 
 	<groupId>org.gmdev</groupId>
-	<artifactId>reactivedemo</artifactId>
+	<artifactId>springboot-reactive-demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<name>springboot-reactive</name>
@@ -19,7 +19,7 @@
 
 	<properties>
 		<java.version>17</java.version>
-		<testcontainers.version>1.18.0</testcontainers.version>
+		<testcontainers.version>1.19.3</testcontainers.version>
 	</properties>
 
 	<dependencies>
@@ -45,7 +45,7 @@
 		<dependency>
 			<groupId>net.logstash.logback</groupId>
 			<artifactId>logstash-logback-encoder</artifactId>
-			<version>7.2</version>
+			<version>7.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.janino</groupId>
